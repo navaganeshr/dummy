@@ -22,7 +22,6 @@ helm repo add cord https://charts.opencord.org
 helm repo add atomix https://charts.atomix.io
 helm repo add onosproject https://charts.onosproject.org
 helm repo update
-helm search repo onos
 ```
 ### Installing helm charts 
 ```
