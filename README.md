@@ -1,4 +1,12 @@
 # ONOS Implementation
+### Prerequisite
+- Linux machine (ubuntu 18.04 LTS preferebly )
+- go 
+- helm 
+- kubectl 
+- docker
+
+
 ## Kind Cluster 
 ### Create a cluster 
 ```
