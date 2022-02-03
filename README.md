@@ -42,3 +42,11 @@ helm -n micro-onos install onos-umbrella onosproject/onos-umbrella
 ```
 kubectl -n micro-onos get pods
 ```
+### Namespace 
+![Namespace](img/ns.png "Title")
+
+### Pods in kubesystem namespace 
+![Namespace](img/kube-system.png "Title")
+
+### Pods Running in micro-onos namespace
+![Pods Running](img/onos_pod.png "Title")
