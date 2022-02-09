@@ -45,6 +45,11 @@ git clone https://github.com/onosproject/onos-helm-charts.git
 cd onos-helm-charts
 git checkout tags/onos-umbrella-1.1.20
 ```
+
+#### Set context 
+```
+kubectl config set-context --current --namespace=micro-onos
+```
 #### onos-gui installation
 
 
