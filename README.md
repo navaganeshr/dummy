@@ -36,8 +36,41 @@ helm repo update
 helm install -n kube-system atomix-controller atomix/atomix-controller
 helm install -n kube-system atomix-raft-storage atomix/atomix-raft-storage
 helm install -n kube-system onos-operator onosproject/onos-operator
-helm -n micro-onos install onos-umbrella onosproject/onos-umbrella
 ```
+### Installing onus-umbrella applications
+#### Clone the repository and get inside the repo 
+
+```
+git clone https://github.com/onosproject/onos-helm-charts.git
+cd onos-helm-charts
+git checkout tags/onos-umbrella-1.1.20
+```
+#### onos-gui installation
+
+
+```
+cd onos-gui
+helm install onos-gui .
+cd ..
+```
+#### onos-topo installation
+
+
+```
+cd onos-topo
+helm install onos-topo .
+cd ..
+```
+
+#### onos-topo installation
+
+
+```
+cd onos-config
+helm install onos-config .
+cd ..
+```
+
 ### Validate if all pods are ruuning 
 ```
 kubectl -n micro-onos get pods
