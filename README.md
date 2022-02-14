@@ -1,4 +1,5 @@
 # ONOS Implementation
+## Bootstrap **ONOS nRT-RIC** setup 
 ### Prerequisite
 - Linux machine (ubuntu 18.04 LTS preferebly )
 - go 
@@ -38,13 +39,6 @@ helm install -n kube-system atomix-raft-storage atomix/atomix-raft-storage
 helm install -n kube-system onos-operator onosproject/onos-operator
 ```
 ### Installing onus-umbrella applications
-#### Clone the repository and get inside the repo 
-
-```
-git clone https://github.com/onosproject/onos-helm-charts.git
-cd onos-helm-charts
-git checkout tags/onos-umbrella-1.1.20
-```
 
 #### Set context 
 ```
@@ -52,14 +46,12 @@ kubectl config set-context --current --namespace=micro-onos
 ```
 #### onos-gui installation
 
-
 ```
 cd onos-gui
 helm install onos-gui .
 cd ..
 ```
 #### onos-topo installation
-
 
 ```
 cd onos-topo
@@ -69,10 +61,41 @@ cd ..
 
 #### onos-topo installation
 
-
 ```
 cd onos-config
 helm install onos-config .
+cd ..
+```
+
+#### onos-uenib
+
+```
+cd onos-uenib/
+helm install onos-uenib .
+cd ..
+```
+
+#### onos-e2t
+
+```
+cd onos-e2t/
+helm install onos-e2t .
+cd ..
+```
+
+#### ran-simulator
+
+```
+cd ran-simulator/
+helm install ran-simulator .
+cd ..
+```
+
+#### onos-exporter
+
+```
+cd onos-exporter/
+helm install onos-exporter .
 cd ..
 ```
 
@@ -88,3 +111,8 @@ kubectl -n micro-onos get pods
 
 ### Pods Running in micro-onos namespace
 ![Pods Running](img/onos_pod.png "Title")
+
+
+
+
+

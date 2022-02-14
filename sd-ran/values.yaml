@@ -1,0 +1,291 @@
+# SPDX-FileCopyrightText: 2020-present Open Networking Foundation <info@opennetworking.org>
+#
+# SPDX-License-Identifier: Apache-2.0
+
+# Default values for all SD-RAN Helm charts.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+global:
+  fullnameOverride: "onos"
+  nameOverride: ""
+  image:
+    registry: ""
+    tag: ""
+  store:
+    consensus:
+      enabled: true
+      name: ""
+      image:
+        registry: ""
+        repository: atomix/atomix-raft-storage-node
+        tag: ""
+        pullPolicy: IfNotPresent
+        pullSecrets: []
+      replicas: 1
+      partitions: 1
+      raft: {}
+      persistence:
+        storageClass: ""
+        storageSize: 1Gi
+
+import:
+  onos-topo:
+    enabled: true
+  onos-uenib:
+    enabled: true
+  onos-e2t:
+    enabled: true
+  onos-a1t:
+    enabled: true
+  onos-o1t:
+    enabled: false
+  onos-config:
+    enabled: true
+  onos-cli:
+    enabled: true
+  ran-simulator:
+    enabled: false
+  onos-gui:
+    enabled: false
+  nem-monitoring:
+    enabled: false
+  onos-kpimon:
+    enabled: false
+  onos-pci:
+    enabled: false
+  fb-kpimon-xapp:
+    enabled: false
+  fb-ah-xapp:
+    enabled: false
+  fb-ah-gui:
+    enabled: false
+  onos-mho:
+    enabled: false
+  onos-mlb:
+    enabled: false
+  onos-rsm:
+    enabled: false
+  ah-eson-test-server:
+    enabled: false
+  fluent-bit:
+    enabled: false
+  opendistro-es:
+    enabled: false
+  prometheus-stack:
+    enabled: false
+  onos-exporter:
+    enabled: false
+
+# NEM-Monitoring
+nem-monitoring:
+  prometheus:
+    serverFiles:
+      prometheus.yml:
+        scrape_configs:
+          - job_name: 'onos-ric'
+            metrics_path: /metrics
+            scrape_interval: 1s
+            static_configs:
+              - targets:
+                  - onos-ric.micro-onos.svc.cluster.local:7000
+          - job_name: 'onos-ric-ho'
+            metrics_path: /metrics
+            scrape_interval: 1s
+            static_configs:
+              - targets:
+                  - onos-ric-ho.micro-onos.svc.cluster.local:7001
+          - job_name: 'onos-ric-mlb'
+            metrics_path: /metrics
+            scrape_interval: 1s
+            static_configs:
+              - targets:
+                  - onos-ric-mlb.micro-onos.svc.cluster.local:7002
+          - job_name: 'ran-simulator'
+            metrics_path: /metrics
+            scrape_interval: 1s
+            static_configs:
+              - targets:
+                  - ran-simulator.micro-onos.svc.cluster.local:9090
+  dashboards:
+    nodeExporter: false
+    sdran: true
+  kpi_exporter:
+    enabled: false
+  grafana:
+    datasources:
+      datasources.yaml:
+        apiVersion: 1
+        datasources:
+          - name: Prometheus
+            type: prometheus
+            url: http://sd-ran-prometheus-server
+            access: proxy
+            isDefault: true
+
+onos-topo:
+  store:
+    consensus:
+      enabled: false
+
+onos-uenib:
+  store:
+    consensus:
+      enabled: false
+
+onos-config:
+  store:
+    consensus:
+      enabled: false
+  models:
+    ric:
+      v1:
+        enabled: true
+
+onos-ric:
+  storage:
+    consensus:
+      enabled: false
+
+onos-e2t:
+  store:
+    consensus:
+      enabled: false
+  servicemodels:
+    - name: e2sm_rc_pre
+      version: 1.0.0
+      image:
+        repository: onosproject/service-model-docker-e2sm_rc_pre-1.0.0
+        tag: v0.8.4
+        pullPolicy: IfNotPresent
+    - name: e2sm_kpm_v2
+      version: 1.0.0
+      image:
+        repository: onosproject/service-model-docker-e2sm_kpm_v2-1.0.0
+        tag: v0.8.4
+        pullPolicy: IfNotPresent
+    - name: e2sm_mho
+      version: 1.0.0
+      image:
+        repository: onosproject/service-model-docker-e2sm_mho-1.0.0
+        tag: v0.8.4
+        pullPolicy: IfNotPresent
+    - name: e2sm_rsm
+      version: 1.0.0
+      image:
+        repository: onosproject/service-model-docker-e2sm_rsm-1.0.0
+        tag: v0.8.4
+        pullPolicy: IfNotPresent
+
+
+onos-cli:
+  postInstall:
+    placeholder: true
+    topo: berlin-honeycomb-4-3-topo.yaml
+    toponew: berlin-honeycomb-4-3-toponew.yaml
+    config: [ berlin-honeycomb-4-3-gnmi.yaml ]
+
+
+onos-exporter:
+  config:
+    onos-exporter:
+      mode: "prometheus"
+      e2tEndpoint: "onos-e2t:5150"
+      xappPciEndpoint: "onos-pci:5150"
+      xappKpimonEndpoint: "onos-kpimon:5150"
+      topoEndpoint: "onos-topo:5150"
+      uenibEndpoint: "onos-uenib:5150"
+
+prometheus-stack:
+  elasticsearchDatasources:
+    - name: sdran-es
+      endpoint: http://sd-ran-opendistro-es-client-service:9200
+
+  grafanaDashboards:
+    - kubernetes-logs-pod.json
+    - sdran.json
+    - sdran-kpis.json
+
+opendistro-es:
+  elasticsearch:
+    config:
+      opendistro_security.disabled: true
+    master:
+      persistence:
+        enabled: false
+    data:
+      persistence:
+        enabled: false
+  kibana:
+    # image: amazon/opendistro-for-elasticsearch-kibana-no-security
+    # imagePullPolicy: IfNotPresent
+    externalPort: 5601
+    config:
+      elasticsearch.hosts: http://sd-ran-opendistro-es-client-service:9200
+      elasticsearch.requestTimeout: 360000
+      server.ssl.enabled: false
+
+fluent-bit:
+  config:
+    service: |
+      [SERVICE]
+          Flush 1
+          Daemon Off
+          Log_Level info
+          Parsers_File parsers.conf
+          Parsers_File custom_parsers.conf
+          HTTP_Server On
+          HTTP_Listen 0.0.0.0
+          HTTP_Port 2020
+
+    # https://docs.fluentbit.io/manual/pipeline/inputs
+    inputs: |
+      [INPUT]
+          Name tail
+          Path /var/log/containers/*.log
+          Parser docker
+          Tag kube.*
+          Mem_Buf_Limit 128MB
+          Skip_Long_Lines On
+
+      [INPUT]
+          Name systemd
+          Tag host.*
+          Systemd_Filter _SYSTEMD_UNIT=kubelet.service
+          Read_From_Tail On
+
+    # https://docs.fluentbit.io/manual/pipeline/filters
+    filters: |
+      [FILTER]
+          Name kubernetes
+          Match kube.*
+          Merge_Log On
+          Keep_Log Off
+          K8S-Logging.Parser On
+          K8S-Logging.Exclude On
+          Cache_Use_Docker_Id On
+
+    # https://docs.fluentbit.io/manual/pipeline/outputs
+    outputs: |
+      [OUTPUT]
+          Name es
+          Host sd-ran-opendistro-es-client-service
+          Port 9200
+          Logstash_Format On
+          Logstash_Prefix fluentbit
+          Time_Key @timestamp
+          Replace_Dots On
+          Generate_ID On
+          Match kube.*
+          net.connect_timeout         100
+          net.keepalive               on
+          net.keepalive_idle_timeout  300
+
+    ## https://docs.fluentbit.io/manual/pipeline/parsers
+    customParsers: |
+      [PARSER]
+        Name sdran
+        Format regex
+        Regex ^(?<timestamp>\d{4}-\d{2}-\d{2}.\d{2}:\d{2}:\d{2}.\d{3}).\s+(?<logLevel>\S+)\s+(?<process>\S+)\s+(?<file>\S+):(?<lineNo>\d+)\s+(?<log>.*)$
+        Time_Key timestamp
+        Time_Format %Y-%m-%dT%H:%M:%S.%L

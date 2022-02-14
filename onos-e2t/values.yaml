@@ -1,0 +1,124 @@
+# SPDX-FileCopyrightText: 2020-present Open Networking Foundation <info@opennetworking.org>
+#
+# SPDX-License-Identifier: Apache-2.0
+
+# Default values for onos-e2t.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+global:
+  image:
+    registry: ""
+    tag: ""
+  store:
+    consensus:
+      name: ""
+      image:
+        registry: ""
+        tag: ""
+
+replicaCount: 1
+
+image:
+  registry: ""
+  repository: onosproject/onos-e2t
+  tag: '{{ .Chart.AppVersion }}'
+  pullPolicy: IfNotPresent
+  pullSecrets: []
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: "onos-e2t"
+
+store:
+  consensus:
+    enabled: true
+    name: ""
+    image:
+      registry: ""
+      repository: atomix/atomix-raft-storage-node
+      tag: ""
+      pullPolicy: IfNotPresent
+      pullSecrets: []
+    replicas: 1
+    partitions: 1
+    raft: {}
+    persistence:
+      storageClass: ""
+      storageSize: 1Gi
+
+servicemodels:
+  - name: e2sm_rc_pre
+    version: 1.0.0
+    image:
+      repository: onosproject/service-model-docker-e2sm_rc_pre-1.0.0
+      tag: v0.8.4
+      pullPolicy: IfNotPresent
+  - name: e2sm_kpm_v2
+    version: 1.0.0
+    image:
+      repository: onosproject/service-model-docker-e2sm_kpm_v2-1.0.0
+      tag: v0.8.4
+      pullPolicy: IfNotPresent
+  - name: e2sm_mho
+    version: 1.0.0
+    image:
+      repository: onosproject/service-model-docker-e2sm_mho-1.0.0
+      tag: v0.8.4
+      pullPolicy: IfNotPresent
+  - name: e2sm_rsm
+    version: 1.0.0
+    image:
+      repository: onosproject/service-model-docker-e2sm_rsm-1.0.0
+      tag: v0.8.4
+      pullPolicy: IfNotPresent
+#  - name: e2sm_ni
+#    version: 1.0.0
+#    image:
+#      repository: onosproject/service-model-docker-e2sm_ni-1.0.0
+#      tag: v0.6.6
+#      pullPolicy: IfNotPresent
+
+service:
+  # TODO: External NodePort service should be disabled by default
+  external:
+    enabled: false
+  e2:
+    port: 36421
+    nodePort: 30421
+    protocol: SCTP
+  grpc:
+    port: 5150
+    protocol: TCP
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+logging:
+  loggers:
+    root:
+      level: info
+      output:
+        stdout:
+          sink: stdout
+    atomix:
+      level: error
+  sinks:
+    stdout:
+      type: stdout
+      stdout: {}
